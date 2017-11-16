@@ -16,7 +16,7 @@ class CliHypervisorStats(command.Command):
         parser = super(CliHypervisorStats, self).get_parser(prog_name)
         parser.add_argument(
             '--hypervisor',
-            metavar='<project>',
+            metavar='<hypervisor>',
             required=False,
             help=_('Only display on specific hypervisors')
         )

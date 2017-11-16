@@ -1,5 +1,6 @@
 import logging
 import os
+import cybera_utils
 
 from osc_lib.command import command
 from osc_lib import utils
@@ -18,7 +19,6 @@ class CliServerList(command.Lister):
         parser.add_argument(
             '--status',
             metavar='<status>',
-            default='active',
             help=_('Search by server status'),
         )
         parser.add_argument(
@@ -78,20 +78,19 @@ class CliServerList(command.Lister):
 
         project_id = None
         if parsed_args.project:
-            project_id = identity_common.find_project(
-                identity_client,
-                parsed_args.project,
-                parsed_args.project_domain,
-            ).id
+            project_id = cybera_utils.project_fuzzy_search(
+                    identity_client,
+                    parsed_args.project
+            )
             parsed_args.all_projects = True
 
         user_id = None
         if parsed_args.user:
-            user_id = identity_common.find_user(
-                identity_client,
-                parsed_args.user,
-                parsed_args.user_domain,
-            ).id
+            user_id = cybera_utils.user_fuzzy_search(
+                    identity_client,
+                    parsed_args.user
+            )
+            parsed_args.all_projects = True
 
         # Nova only supports list servers searching by flavor ID. So if a
         # flavor name is given, map it to ID.
@@ -166,7 +165,7 @@ class CliServerList(command.Lister):
         projects = {}
         # Create a dict that maps project_id to project object.
         try:
-            projects_list = self.app.client_manager.identity.tenants.list()
+            projects_list = self.app.client_manager.identity.projects.list()
             for p in projects_list:
                 projects[p.id] = p
         except Exception:

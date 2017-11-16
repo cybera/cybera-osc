@@ -25,25 +25,28 @@ class CliAddCyberabotToProjects(command.Command):
 
     def take_action(self, parsed_args):
         identity_client = self.app.client_manager.identity
-        member_role = utils.find_resource(identity_client.roles, '_member_')
+        member_role = utils.find_resource(identity_client.roles, 'Member')
         reseller_role = utils.find_resource(identity_client.roles, 'ResellerAdmin')
         cyberabot_user = utils.find_resource(identity_client.users, 'cyberabot')
 
         member_added_to = []
         reseller_added_to = []
 
-        projects_list = self.app.client_manager.identity.tenants.list()
+        projects_list = self.app.client_manager.identity.projects.list(enabled=True)
         for project in projects_list:
             LOG.debug("Cybera: Checking for cyberabot membership in %s" % project.name)
             is_member = False
             is_reseller = False
-            assignments = identity_client.roles.roles_for_user(cyberabot_user.id, project.id)
+
+            assignments = identity_client.role_assignments.list(
+                user=cyberabot_user.id,
+                project=project.id,
+                include_names=True)
+
             for assignment in assignments:
-                if assignment.name == '_member_':
+                if assignment.role['name'] == 'Member':
                     is_member = True
-                if assignment.name == 'Member':
-                    is_member = True
-                if assignment.name == 'ResellerAdmin':
+                if assignment.role['name'] == 'ResellerAdmin':
                     is_reseller = True
 
             if not is_member:
@@ -65,9 +68,10 @@ class CliAddCyberabotToProjects(command.Command):
                     )
                 reseller_added_to.append(project.name)
 
-        print("cyberabot was added to the following projects as a _member_:")
+        print("cyberabot was added to the following projects as a Member:")
         for p in member_added_to:
             print(p)
+        print ""
         print("cyberabot was added to the following projects as a ResellerAdmin:")
         for p in reseller_added_to:
             print(p)

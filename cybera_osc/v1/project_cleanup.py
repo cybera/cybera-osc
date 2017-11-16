@@ -10,7 +10,7 @@ class CliProjectCleanup(command.Command):
     _description = _("Cleanup user account")
 
     def get_parser(self, prog_name):
-        parser = super(CliUserCleanup, self).get_parser(prog_name)
+        parser = super(CliProjectCleanup, self).get_parser(prog_name)
         parser.add_argument(
             '--noop',
             action='store_true',

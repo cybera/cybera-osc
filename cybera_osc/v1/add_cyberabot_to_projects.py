@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -68,10 +69,19 @@ class CliAddCyberabotToProjects(command.Command):
                     )
                 reseller_added_to.append(project.name)
 
-        print("cyberabot was added to the following projects as a Member:")
-        for p in member_added_to:
-            print(p)
-        print ""
-        print("cyberabot was added to the following projects as a ResellerAdmin:")
-        for p in reseller_added_to:
-            print(p)
+        pretty = ""
+        if len(member_added_to) > 0:
+            pretty = "cyberabot was added to the following projects as a Member:<br>\n"
+            for p in member_added_to:
+                pretty += "%s<br>\n" % p
+            pretty += "<br>\n"
+            pretty += "cyberabot was added to the following projects as a ResellerAdmin:<br>\n"
+            for p in reseller_added_to:
+                pretty += "%s<br>\n" % p
+            pretty += "<br>\n"
+
+        output = {}
+        output['member_added_to'] = member_added_to
+        output['reseller_added_to'] = reseller_added_to
+        output['pretty']  = pretty
+        print json.dumps(output)

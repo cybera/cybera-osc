@@ -122,6 +122,7 @@ class CliServerList(command.Lister):
 	    'Name',
 	    'Project Name',
 	    'User Name',
+            'Flavor',
 	    'Status',
 	    'OS-EXT-STS:task_state',
 	    'OS-EXT-STS:power_state',
@@ -135,6 +136,7 @@ class CliServerList(command.Lister):
 	    'Name',
 	    'Project Name',
 	    'User Name',
+            'Flavor',
 	    'Status',
 	    'Task State',
 	    'Power State',
@@ -162,6 +164,14 @@ class CliServerList(command.Lister):
         except Exception:
             pass
 
+        flavors = {}
+        try:
+            flavors_list = compute_client.flavors.list()
+            for f in flavors_list:
+                flavors[f.id] = f
+        except Exception:
+            pass
+
         projects = {}
         # Create a dict that maps project_id to project object.
         try:
@@ -183,6 +193,13 @@ class CliServerList(command.Lister):
         # Populate image_name and image_id attributes of server objects
         # so that we can display "Image Name" and "Image ID" columns.
         for s in data:
+            if 'id' in s.flavor:
+                flavor = flavors.get(s.flavor['id'])
+                if flavor:
+                    s.flavor = flavor.name
+                else:
+                    s.flavor = flavor.id
+
             if 'id' in s.image:
                 image = images.get(s.image['id'])
                 if image:

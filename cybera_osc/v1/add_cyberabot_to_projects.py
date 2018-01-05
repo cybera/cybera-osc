@@ -53,20 +53,30 @@ class CliAddCyberabotToProjects(command.Command):
             if not is_member:
                 LOG.debug("Cybera: cyberabot is not a member of %s" % project.name)
                 if not parsed_args.noop:
-                    result = identity_client.roles.add_user_role(
-                            cyberabot_user.id,
-                            member_role.id,
-                            project.id,
-                    )
+                    kwargs = {}
+                    kwargs['user'] = cyberabot_user.id
+                    kwargs['project'] = project.id
+                    result = identity_client.roles.grant(member_role.id, **kwargs)
+
+                    #result = identity_client.roles.add_user_role(
+                    #        cyberabot_user.id,
+                    #        member_role.id,
+                    #        project.id,
+                    #)
                 member_added_to.append(project.name)
             if not is_reseller:
                 LOG.debug("Cybera: cyberabot is not a reselleradmin of %s" % project.name)
                 if not parsed_args.noop:
-                    result = identity_client.roles.add_user_role(
-                            cyberabot_user.id,
-                            member_role.id,
-                            project.id,
-                    )
+                    kwargs = {}
+                    kwargs['user'] = cyberabot_user.id
+                    kwargs['project'] = project.id
+                    result = identity_client.roles.grant(reseller_role.id, **kwargs)
+
+                    #result = identity_client.roles.add_user_role(
+                    #        cyberabot_user.id,
+                    #        reseller_role.id,
+                    #        project.id,
+                    #)
                 reseller_added_to.append(project.name)
 
         pretty = ""

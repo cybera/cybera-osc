@@ -81,14 +81,14 @@ class CliAddCyberabotToProjects(command.Command):
 
         pretty = ""
         if len(member_added_to) > 0:
-            pretty = "cyberabot was added to the following projects as a Member:<br>\n"
+            pretty = "cyberabot was added to the following projects as a Member:<br>"
             for p in member_added_to:
-                pretty += "%s<br>\n" % p
-            pretty += "<br>\n"
-            pretty += "cyberabot was added to the following projects as a ResellerAdmin:<br>\n"
+                pretty += "%s<br>" % p
+            pretty += "<br>"
+            pretty += "cyberabot was added to the following projects as a ResellerAdmin:<br>"
             for p in reseller_added_to:
-                pretty += "%s<br>\n" % p
-            pretty += "<br>\n"
+                pretty += "%s<br>" % p
+            pretty += "<br>"
 
         output = {}
         output['member_added_to'] = member_added_to

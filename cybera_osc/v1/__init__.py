@@ -1,6 +1,7 @@
 from add_cyberabot_to_projects import *
 from cybera_test import *
 from floating_ip_delete import *
+from floating_ip_show import *
 from hypervisor_stats import *
 from project_artifacts import *
 from project_cleanup import *

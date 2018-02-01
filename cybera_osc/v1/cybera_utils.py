@@ -78,3 +78,38 @@ def user_fuzzy_search(identity_client, username=""):
 
     return found[0]
 
+def image_fuzzy_search(identity_client, image_name=""):
+    if image_name == "":
+        return None
+
+    image_list = identity_client.image.list()
+    found = []
+
+    # Look for uuid match first
+    match = False
+    for image in image_list:
+        if image_name.lower() == image.id.lower():
+            found.append(image.id)
+            match = True
+            break
+
+    # Look for exact name match
+    if not match:
+        for image in image_list:
+            if image_name.lower() == image.name.lower():
+                found.append(image.id)
+                match = True
+                break
+
+    # Look for substring
+    if not match:
+        for image in image_list:
+            if image.name.lower().find(image_name.lower()) != -1:
+                found.append(image.id)
+
+    if len(found) > 1:
+        raise Exception("More than one image found")
+    if len(found) == 0:
+        raise Exception("No image found")
+
+    return found[0]

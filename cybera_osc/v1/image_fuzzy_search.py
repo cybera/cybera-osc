@@ -21,7 +21,7 @@ class CliImageFuzzySearch(command.Command):
         return i
 
     def take_action(self, parsed_args):
-        identity_client = self.app.client_manager.identity
-        image_id = cybera_utils.image_fuzzy_search(identity_client, parsed_args.image)
+        image_client = self.app.client_manager.image
+        image_id = cybera_utils.image_fuzzy_search(image_client, parsed_args.image)
         sys.stdout.write(image_id)
         sys.stdout.flush()

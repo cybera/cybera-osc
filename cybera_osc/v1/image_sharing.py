@@ -29,12 +29,17 @@ class CliImageSharing(command.Command):
         return p
 
     def take_action(self, parsed_args):
+        identity_client = self.app.client_manager.identity
         image_client = self.app.client_manager.image
 
         kwargs = {}
-        kwargs['image'] = image_fuzzy_search(image_client, parsed_args.image.strip())
-        kwargs['project'] = project_fuzzy_search(image_client, parsed_args.project.strip())
+        image_id = image_fuzzy_search(image_client, parsed_args.image.strip())
+        project_id = project_fuzzy_search(identity_client, parsed_args.project.strip())
 
-        # this is what I think....but I am most likely wrong
-        #image_client.blah.blah.associate.project(**kwargs)
-        #image_client.blah.blah.access.grant(**kwargs)
+        image_member = image_client.image_members.create(
+            image_id,
+            project_id,
+        )
+        image_client.image_members.update(
+            image_id, project_id, 'accepted'
+        )

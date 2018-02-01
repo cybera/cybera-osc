@@ -3,6 +3,8 @@ from cybera_test import *
 from floating_ip_delete import *
 from floating_ip_show import *
 from hypervisor_stats import *
+from image_fuzzy_search import *
+from image_sharing import *
 from project_artifacts import *
 from project_cleanup import *
 from project_fuzzy_search import *

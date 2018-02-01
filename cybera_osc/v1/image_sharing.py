@@ -32,11 +32,10 @@ class CliImageSharing(command.Command):
         identity_client = self.app.client_manager.identity
         image_client = self.app.client_manager.image
 
-        kwargs = {}
         image_id = image_fuzzy_search(image_client, parsed_args.image.strip())
         project_id = project_fuzzy_search(identity_client, parsed_args.project.strip())
 
-        image_member = image_client.image_members.create(
+        image_client.image_members.create(
             image_id,
             project_id,
         )

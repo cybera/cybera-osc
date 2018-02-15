@@ -39,6 +39,7 @@ class CliCreateProvider(command.Command):
         p.add_argument(
             '--provider-network-type',
             metavar='<provider-network-type>',
+            dest='provider_network_type',
             help=_("The physical mechanism by which the virtual network "
                "is implemented. For example: "
                "flat, geneve, gre, local, vlan, vxlan.")

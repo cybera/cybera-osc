@@ -55,7 +55,7 @@ class CliCreateProvider(command.Command):
             dest='segmentation_id',
             help=_("VLAN ID for VLAN networks or Tunnel ID for GENEVE/GRE/VXLAN networks")
         )
-        identity_common.add_project_domain_option_to_parser(prog_name)
+        identity_common.add_project_domain_option_to_parser(p)
         p.add_argument(
             '--availability-zone-hint',
             action='append',
@@ -83,14 +83,17 @@ class CliCreateProvider(command.Command):
         attrs = {}
         if parsed_args.name is not None:
             attrs['name'] = str(parsed_args.name)
-        if 'project' in parsed_args and parsed_args.project is not None:
+        if parsed_args.project:
             identity_client = client_manager.identity
-            project_id = identity_common.find_project(
-                identity_client,
-                parsed_args.project,
-                parsed_args.project_domain,
+            project_id = project_fuzzy_search(
+                    identity_client,
+                    parsed_args.project.strip()
             ).id
-            attrs['tenant_id'] = project_id
+           # project_id = identity_common.find_project(
+           #     identity_client,
+           #     parsed_args.project,
+           #     parsed_args.project_domain,
+           # ).id
             attrs['project_id'] = project_id
         if parsed_args.description:
             attrs['description'] = parsed_args.description
@@ -100,20 +103,23 @@ class CliCreateProvider(command.Command):
             attrs['provider:physical_network'] = parsed_args.physical_network
         if parsed_args.segmentation_id:
             attrs['provider:segmentation_id'] = parsed_args.segmentation_id
-        if 'availability_zone_hints' in parsed_args and parsed_args.availability_zone_hints is not None:
+        if parsed_args.availability_zone_hints:
             attrs['availability_zone_hints'] = parsed_args.availability_zone_hints
+        #if 'availability_zone_hints' in parsed_args and parsed_args.availability_zone_hints is not None:
+        #    attrs['availability_zone_hints'] = parsed_args.availability_zone_hints
         if parsed_args.external:
             attrs['router:external'] = False
         if parsed_args.disable_port_security:
             attrs['port_security_enabled'] = False
+        #attrs['availability_zone_hint'] = 'nova'
+
         return attrs
 
     def take_action(self, parsed_args):
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
 
-        identity_client = self.app.client_manager.identity
+        #identity_client = self.app.client_manager.identity
         network_client = self.app.client_manager.network
 
-        project_id = project_fuzzy_search(identity_client, parsed_args.project.strip())
-
+        print attrs
         network_client.create_network(**attrs)

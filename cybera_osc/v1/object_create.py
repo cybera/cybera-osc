@@ -72,8 +72,9 @@ class CliCreateObject(command.Command):
                 LOG.warning(
                     _('Object name is %s characters long, the default limit'
                       ' is 1024'), len(obj))
-            data = conn.put_object(
-		parsed_args.container,
-                parsed_args.name,
-                obj
+            with open(obj, 'r') as content:
+                data = conn.put_object(
+                    parsed_args.container,
+                    parsed_args.name,
+                    content
             )

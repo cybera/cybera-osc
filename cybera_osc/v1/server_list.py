@@ -198,7 +198,7 @@ class CliServerList(command.Lister):
                 if flavor:
                     s.flavor = flavor.name
                 else:
-                    s.flavor = flavor.id
+                    s.flavor = s.flavor['id']
 
             if 'id' in s.image:
                 image = images.get(s.image['id'])

@@ -33,7 +33,7 @@ class CliAddCyberabotToProjects(command.Command):
         member_added_to = []
         reseller_added_to = []
 
-        projects_list = self.app.client_manager.identity.projects.list(enabled=True)
+        projects_list = self.app.client_manager.identity.projects.list(enabled=True, domain="default")
         for project in projects_list:
             LOG.debug("Cybera: Checking for cyberabot membership in %s" % project.name)
             is_member = False

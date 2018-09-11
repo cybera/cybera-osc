@@ -106,11 +106,16 @@ class CliServerList(command.Lister):
             image_id = utils.find_resource(compute_client.images,
                                            parsed_args.image).id
 
+        host = None
+        if parsed_args.host:
+            host = parsed_args.host.strip('`')
+            host = parsed_args.host.strip('http://')
+
         search_opts = {
             'status': parsed_args.status,
             'flavor': flavor_id,
             'image': image_id,
-            'host': parsed_args.host,
+            'host': host,
             'tenant_id': project_id,
             'all_tenants': parsed_args.all_projects,
             'user_id': user_id,

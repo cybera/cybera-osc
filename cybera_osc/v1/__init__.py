@@ -15,6 +15,7 @@ from user_cleanup import *
 from user_membership import *
 from user_fuzzy_search import *
 from network_create_provider import *
+from create_vfs_subnet import *
 from container_create import *
 from object_create import *
 from network_list import *

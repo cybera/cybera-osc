@@ -1,3 +1,4 @@
+import json
 import logging
 
 from cybera_utils import project_fuzzy_search
@@ -122,9 +123,6 @@ class CliCreateProvider(command.Command):
 
     def take_action(self, parsed_args):
         attrs = self._get_attrs(self.app.client_manager, parsed_args)
-        print attrs
-
         network_client = self.app.client_manager.network
-        network_client.create_network(**attrs)
-        import inspect
-        print inspect.getsource(network_client.create_network)
+        result = network_client.create_network(**attrs)
+        print json.dumps(result.to_dict())

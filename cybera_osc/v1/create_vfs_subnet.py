@@ -62,7 +62,7 @@ class CliCreateVFSSubnet(command.Command):
         attrs['network_id'] = parsed_args.network
         attrs['cidr'] = parsed_args.subnet_range
         attrs['gateway'] = parsed_args.gateway
-        attrs['no_dhcp'] = True
+        attrs['enable_dhcp'] = False
         attrs['ip_version'] = 4
 
         return attrs

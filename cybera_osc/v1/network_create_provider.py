@@ -28,7 +28,7 @@ class CliCreateProvider(command.Command):
             '--project',
             metavar='<project>',
             required=True,
-            help=_('The project to share the image with.'),
+            help=_('The project to own the network.'),
         )
         p.add_argument(
             '--description',
@@ -95,11 +95,6 @@ class CliCreateProvider(command.Command):
                     identity_client,
                     parsed_args.project.strip()
             )
-           # project_id = identity_common.find_project(
-           #     identity_client,
-           #     parsed_args.project,
-           #     parsed_args.project_domain,
-           # ).id
             attrs['tenant_id'] = project_id
         if parsed_args.description:
             attrs['description'] = parsed_args.description
@@ -111,7 +106,6 @@ class CliCreateProvider(command.Command):
             attrs['provider:segmentation_id'] = parsed_args.segmentation_id
         if parsed_args.availability_zone_hints:
             attrs['availability_zone_hints'] = parsed_args.availability_zone_hints
-        #attrs['availability_zone_hint'] = 'nova'
         if parsed_args.external:
             attrs['router:external'] = False
         if parsed_args.disable_port_security:

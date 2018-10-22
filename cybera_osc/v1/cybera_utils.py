@@ -1,8 +1,10 @@
+import StringIO
 import logging
 import os
 
 from osc_lib.command import command
 from osc_lib import utils
+from six.moves import urllib
 
 def project_fuzzy_search(identity_client, project_name=""):
     projects_list = identity_client.projects.list()
@@ -76,3 +78,54 @@ def fuzzy_search(search_string, search_list):
                 found.append(x.id)
 
     return found
+
+def get_image(image_client, uuid):
+    return utils.find_resource(image_client.images, uuid)
+
+def get_latest_image(image_client, image_name):
+    kwargs = {}
+    kwargs['filters'] = {
+        'name': image_name,
+        'sort_key': 'created_at',
+        'sort_dir': 'desc',
+    }
+    image_list = list(image_client.images.list(**kwargs))
+
+    return image_list
+
+def get_object(object_client, container, object):
+    content = StringIO.StringIO()
+    response = object_client._request(
+        'GET',
+        '%s/%s' % (urllib.parse.quote(container),
+                   urllib.parse.quote(object)),
+        stream=True,
+    )
+
+    if response.status_code == 200:
+        for chunk in response.iter_content(64 * 1024):
+            content.write(chunk)
+
+    return content.getvalue()
+
+def put_object(object_client, container_name, object_name, contents, headers):
+    full_url = "%s/%s" % (urllib.parse.quote(container_name),
+                          urllib.parse.quote(object_name))
+    object_client.create(full_url, method='PUT', data=contents, headers=headers)
+
+def get_instance(compute_client, uuid):
+    try:
+        instance = utils.find_resource(compute_client.servers, uuid)
+    except:
+        instance = None
+
+    return instance
+
+def get_ipv4_address(compute_client, uuid):
+    instance = get_instance(compute_client, uuid)
+    if instance is None:
+        return None
+
+    for i in instance.addresses['default']:
+        if i['version'] == 4:
+            return i['addr']

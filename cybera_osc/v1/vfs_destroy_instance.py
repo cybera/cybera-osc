@@ -1,5 +1,3 @@
-import cybera_utils
-import json
 import logging
 import vfs_utils
 
@@ -16,12 +14,5 @@ class CliVFSDestroyInstance(command.Command):
         return p
 
     def take_action(self, parsed_args):
-        heat_client = self.app.client_manager.orchestration
-        compute_client = self.app.client_manager.compute
-
-        filters = {
-            'stack_name': 'cybera_virtual_firewall',
-        }
-
-        stacks = heat_client._list(filters)
-        print stacks
+        panos = vfs_utils.PANOS()
+        stack = panos.destroy_instance(self.app.client_manager)

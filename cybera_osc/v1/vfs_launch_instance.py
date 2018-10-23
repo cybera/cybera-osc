@@ -1,5 +1,3 @@
-import cybera_utils
-import json
 import logging
 import vfs_utils
 
@@ -28,5 +26,3 @@ class CliVFSLaunchInstance(command.Command):
     def take_action(self, parsed_args):
         panos = vfs_utils.PANOS()
         stack = panos.launch_instance(self.app.client_manager, parsed_args.bootstrap, parsed_args.password)
-
-        print stack

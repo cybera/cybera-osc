@@ -1,5 +1,6 @@
 import cybera_utils
 import json
+import time
 
 import xml.etree.ElementTree as ET
 from xml.dom.minidom import parseString
@@ -47,8 +48,25 @@ class PANOS:
             'timeout_mins': 10,
         }
 
-        stack = heat_client.stacks.create(**fields)['stack']
-        return json.dumps(stack)
+        heat_client.stacks.create(**fields)['stack']
+
+        time.sleep(2)
+
+        created = False
+        for _ in range(10):
+            stacks = self.get_stack(heat_client)
+            if len(stacks) == 1:
+                stack = stacks[0]
+                if stack.stack_status == 'CREATE_COMPLETE':
+                    created = True
+                    break
+                if stack.stack_status == 'CREATE_FAILED':
+                    break
+            time.sleep(10)
+
+        if not created:
+            raise Exception("Unable to create instance")
+
 
     def inject_phash(self, password, bootstrap):
         """
@@ -72,6 +90,30 @@ class PANOS:
     #    delicense_instance(request, deact_key, password)
     #    destroy_instance(request)
     #    launch_instance(request, bootstrap)
+
+    def destroy_instance(self, client_manager):
+        heat_client = client_manager.orchestration
+        stacks = self.get_stack(heat_client)
+        if len(stacks) == 0:
+            raise Exception("No stacks found")
+
+        if len(stacks) > 1:
+            raise Exception("More than 1 stack found")
+
+        stack = stacks[0]
+
+        heat_client.stacks.delete(stack.id)
+
+        destroyed = False
+        for _ in range(10):
+            stacks = self.get_stack(heat_client)
+            if len(stacks) == 0:
+                destroyed = True
+                break
+            time.sleep(10)
+
+        if not destroyed:
+            raise Exception("Instance was not cleanly destroyed")
 
     def create_backup(self, client_manager, uuid, username, password, description):
         compute_client = client_manager.compute
@@ -101,3 +143,17 @@ class PANOS:
         x = parseString(r.text)
         apikey = x.getElementsByTagName('key')[0].childNodes[0].nodeValue
         return apikey
+
+    def get_stack(self, heat_client):
+        filters = {
+            'stack_name': 'cybera_virtual_firewall',
+        }
+
+        res = heat_client.stacks.list(**filters)
+        stacks = []
+        for stack in res:
+            stacks.append(stack)
+
+        return stacks
+
+

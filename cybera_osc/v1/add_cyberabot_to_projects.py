@@ -26,29 +26,30 @@ class CliAddCyberabotToProjects(command.Command):
 
     def take_action(self, parsed_args):
         identity_client = self.app.client_manager.identity
+        cyberabot_user = utils.find_resource(identity_client.users, 'cyberabot')
         member_role = utils.find_resource(identity_client.roles, 'Member')
         reseller_role = utils.find_resource(identity_client.roles, 'ResellerAdmin')
-        cyberabot_user = utils.find_resource(identity_client.users, 'cyberabot')
+
+        assignments = identity_client.role_assignments.list(user=cyberabot_user.id)
+        projects_list = identity_client.projects.list(enabled=True, domain="default")
 
         member_added_to = []
         reseller_added_to = []
-
-        projects_list = self.app.client_manager.identity.projects.list(enabled=True, domain="default")
         for project in projects_list:
             LOG.debug("Cybera: Checking for cyberabot membership in %s" % project.name)
             is_member = False
             is_reseller = False
 
-            assignments = identity_client.role_assignments.list(
-                user=cyberabot_user.id,
-                project=project.id,
-                include_names=True)
+            for a in assignments:
+                # Check for member role
+                if a.role['id'] == member_role.id:
+                    if project.id == a.scope['project']['id']:
+                        is_member = True
 
-            for assignment in assignments:
-                if assignment.role['name'] == 'Member':
-                    is_member = True
-                if assignment.role['name'] == 'ResellerAdmin':
-                    is_reseller = True
+
+                if a.role['id'] == reseller_role.id:
+                    if project.id == a.scope['project']['id']:
+                        is_reseller = True
 
             if not is_member:
                 LOG.debug("Cybera: cyberabot is not a member of %s" % project.name)
@@ -57,12 +58,6 @@ class CliAddCyberabotToProjects(command.Command):
                     kwargs['user'] = cyberabot_user.id
                     kwargs['project'] = project.id
                     result = identity_client.roles.grant(member_role.id, **kwargs)
-
-                    #result = identity_client.roles.add_user_role(
-                    #        cyberabot_user.id,
-                    #        member_role.id,
-                    #        project.id,
-                    #)
                 member_added_to.append(project.name)
             if not is_reseller:
                 LOG.debug("Cybera: cyberabot is not a reselleradmin of %s" % project.name)
@@ -72,11 +67,6 @@ class CliAddCyberabotToProjects(command.Command):
                     kwargs['project'] = project.id
                     result = identity_client.roles.grant(reseller_role.id, **kwargs)
 
-                    #result = identity_client.roles.add_user_role(
-                    #        cyberabot_user.id,
-                    #        reseller_role.id,
-                    #        project.id,
-                    #)
                 reseller_added_to.append(project.name)
 
         pretty = ""

@@ -61,10 +61,13 @@ class CliCreateVFSSubnet(command.Command):
         attrs['project_id'] = project_id
         attrs['network_id'] = parsed_args.network
         attrs['cidr'] = parsed_args.subnet_range
-        attrs['gateway'] = parsed_args.gateway
         attrs['enable_dhcp'] = False
         attrs['ip_version'] = 4
 
+        if parsed_args.gateway == "none":
+            attrs['gateway_ip'] = None
+
+        print attrs
         return attrs
 
     def take_action(self, parsed_args):

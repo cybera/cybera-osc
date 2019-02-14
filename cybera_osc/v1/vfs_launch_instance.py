@@ -21,8 +21,24 @@ class CliVFSLaunchInstance(command.Command):
             metavar='<password>',
             help=_('Initial firewall password'),
         )
+        p.add_argument(
+            '--name',
+            metavar='<name>',
+            help=_('Name of the firewall'),
+        )
+        p.add_argument(
+            '--firewall-type',
+            metavar='<firewall_type>',
+            default="panos",
+            help=_('Type of firewall (panos, fortinet, etc)'),
+        )
         return p
 
     def take_action(self, parsed_args):
         panos = vfs_utils.PANOS()
-        stack = panos.launch_instance(self.app.client_manager, parsed_args.bootstrap, parsed_args.password)
+        stack = panos.launch_instance(
+                self.app.client_manager,
+                bootstrap=parsed_args.bootstrap,
+                password=parsed_args.password,
+                name=parsed_args.name,
+                firewall_type=parsed_args.firewall_type)

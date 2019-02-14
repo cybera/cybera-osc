@@ -14,20 +14,24 @@ class PANOS:
     def __init__(self):
         return
 
-    def launch_instance(self, client_manager, bootstrap, password):
+    def launch_instance(self, client_manager, bootstrap, password, name, firewall_type):
         object_client = client_manager.object_store
         heat_client = client_manager.orchestration
 
-        hot = cybera_utils.get_object(object_client, "CyberaVFS", "hot.panos.yaml")
-        env = cybera_utils.get_object(object_client, "CyberaVFS", "env.panos.yaml")
-        initcfg = cybera_utils.get_object(object_client, "CyberaVFS", "init-cfg.txt").replace('\n', '\\n').strip()
-        authcodes = cybera_utils.get_object(object_client, "CyberaVFS", "authcodes").replace('\n', '\\n').strip()
+        container_name = "CyberaVFS"
+        if name is not None:
+            container_name = "%s/%s" % (container_name, name)
+
+        hot = cybera_utils.get_object(object_client, container_name, "hot.panos.yaml")
+        env = cybera_utils.get_object(object_client, container_name, "env.panos.yaml")
+        initcfg = cybera_utils.get_object(object_client, container_name, "init-cfg.txt").replace('\n', '\\n').strip()
+        authcodes = cybera_utils.get_object(object_client, container_name, "authcodes").replace('\n', '\\n').strip()
 
         try:
             if bootstrap is None:
-                bootstrap = cybera_utils.get_object(object_client, "CyberaVFS", "bootstrap.xml")
+                bootstrap = cybera_utils.get_object(object_client, container_name, "bootstrap.xml")
             else:
-                bootstrap = cybera_utils.get_object(object_client, "CyberaVFS", bootstrap)
+                bootstrap = cybera_utils.get_object(object_client, container_name, bootstrap)
         except:
             raise Exception("bootstrap.xml not found")
 
@@ -41,10 +45,14 @@ class PANOS:
         tpl = tpl.replace('%BOOTSTRAP%', bootstrap)
         tpl = tpl.replace('%AUTHCODES%', authcodes)
 
+        stack_name = "cybera_virtual_firewall"
+        if name is not None:
+            stack_name = name
+
         fields = {
             'environment': env,
             'template': tpl,
-            'stack_name': 'cybera_virtual_firewall',
+            'stack_name': stack_name,
             'timeout_mins': 10,
         }
 
@@ -54,7 +62,7 @@ class PANOS:
 
         created = False
         for _ in range(10):
-            stacks = self.get_stack(heat_client)
+            stacks = self.get_stack(heat_client, name)
             if len(stacks) == 1:
                 stack = stacks[0]
                 if stack.stack_status == 'CREATE_COMPLETE':
@@ -91,9 +99,9 @@ class PANOS:
     #    destroy_instance(request)
     #    launch_instance(request, bootstrap)
 
-    def destroy_instance(self, client_manager):
+    def destroy_instance(self, client_manager, name):
         heat_client = client_manager.orchestration
-        stacks = self.get_stack(heat_client)
+        stacks = self.get_stack(heat_client, name)
         if len(stacks) == 0:
             raise Exception("No stacks found")
 
@@ -106,7 +114,7 @@ class PANOS:
 
         destroyed = False
         for _ in range(10):
-            stacks = self.get_stack(heat_client)
+            stacks = self.get_stack(heat_client, name)
             if len(stacks) == 0:
                 destroyed = True
                 break
@@ -144,9 +152,13 @@ class PANOS:
         apikey = x.getElementsByTagName('key')[0].childNodes[0].nodeValue
         return apikey
 
-    def get_stack(self, heat_client):
+    def get_stack(self, heat_client, name=None):
+        stack_name = "cybera_virtual_firewall"
+        if name is not None:
+            stack_name = name
+
         filters = {
-            'stack_name': 'cybera_virtual_firewall',
+            'stack_name': stack_name,
         }
 
         res = heat_client.stacks.list(**filters)
@@ -155,5 +167,3 @@ class PANOS:
             stacks.append(stack)
 
         return stacks
-
-

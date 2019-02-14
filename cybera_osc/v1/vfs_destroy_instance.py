@@ -11,8 +11,13 @@ class CliVFSDestroyInstance(command.Command):
 
     def get_parser(self, prog_name):
         p = super(CliVFSDestroyInstance, self).get_parser(prog_name)
+        p.add_argument(
+            '--name',
+            metavar='<name>',
+            help=_('Name of the firewall / Heat stack'),
+        )
         return p
 
     def take_action(self, parsed_args):
         panos = vfs_utils.PANOS()
-        stack = panos.destroy_instance(self.app.client_manager)
+        stack = panos.destroy_instance(self.app.client_manager, parsed_args.name)

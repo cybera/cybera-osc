@@ -29,8 +29,13 @@ class CliNetworkList(command.Command):
 
     def take_action(self, parsed_args):
         args = {}
+
+        args['tenant_id'] = parsed_args.project
         args['project_id'] = parsed_args.project
-        args['name'] = parsed_args.name
+
+        if parsed_args.name:
+            args['name'] = parsed_args.name
+
         network_client = self.app.client_manager.network
         data = network_client.networks(**args)
         networks = []

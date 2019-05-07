@@ -2,6 +2,7 @@ from add_cyberabot_to_projects import *
 from container_create import *
 from create_vfs_subnet import *
 from cybera_test import *
+from flavor_fuzzy_search import *
 from floating_ip_delete import *
 from floating_ip_show import *
 from hypervisor_stats import *

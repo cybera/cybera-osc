@@ -48,6 +48,20 @@ def image_fuzzy_search(image_client, image_name=""):
 
     return found[0]
 
+def flavor_fuzzy_search(compute_client, flavor_name=""):
+    flavor_list = list(compute_client.flavors.list())
+    found = fuzzy_search(flavor_name, flavor_list)
+
+    if found is None:
+        return None
+
+    if len(found) > 1:
+        raise Exception("More than one flavor found")
+    if len(found) == 0:
+        raise Exception("No flavor found")
+
+    return found[0]
+
 def fuzzy_search(search_string, search_list):
     """ All objects in search_list must have name and id attributes """
     if search_string == "":

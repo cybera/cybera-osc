@@ -61,7 +61,7 @@ class PANOS:
         time.sleep(2)
 
         created = False
-        for _ in range(10):
+        for _ in range(60):
             stacks = self.get_stack(heat_client, name)
             if len(stacks) == 1:
                 stack = stacks[0]
@@ -113,7 +113,7 @@ class PANOS:
         heat_client.stacks.delete(stack.id)
 
         destroyed = False
-        for _ in range(10):
+        for _ in range(60):
             stacks = self.get_stack(heat_client, name)
             if len(stacks) == 0:
                 destroyed = True

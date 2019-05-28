@@ -18,19 +18,19 @@ class CliProjectUserRemove(command.Command):
             '--user',
             metavar='<user>',
             required=True,
-            help=_('The user being added'),
+            help=_('The user being removed from a project'),
         )
         p.add_argument(
             '--project',
             metavar='<project>',
             required=True,
-            help=_('The the project to add the user to'),
+            help=_('The the project to remove the user from'),
         )
         p.add_argument(
             '--role',
             metavar='<role>',
             required=True,
-            help=_('The the role to grant to the user'),
+            help=_('The the role to revoke on the user'),
         )
         return p
 

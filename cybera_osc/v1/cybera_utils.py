@@ -7,6 +7,14 @@ from osc_lib import utils
 from six.moves import urllib
 
 def project_fuzzy_search(identity_client, project_name=""):
+    # First do a get to see if the exact id matches
+    try:
+        project = identity_client.projects.get(project_name)
+        return project.id
+    except:
+        pass
+
+    # If not found, query for all projects and do a fuzzy-search
     projects_list = identity_client.projects.list()
     found = fuzzy_search(project_name, projects_list)
 
@@ -21,6 +29,14 @@ def project_fuzzy_search(identity_client, project_name=""):
     return found[0]
 
 def user_fuzzy_search(identity_client, username=""):
+    # First do a get to see if the exact id matches
+    try:
+        user = identity_client.users.get(username)
+        return user.id
+    except:
+        pass
+
+    # If not found, query for all users and do a fuzzy-search
     users_list = identity_client.users.list()
     found = fuzzy_search(username, users_list)
 

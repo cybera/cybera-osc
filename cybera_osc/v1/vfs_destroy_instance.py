@@ -16,8 +16,14 @@ class CliVFSDestroyInstance(command.Command):
             metavar='<name>',
             help=_('Name of the firewall / Heat stack'),
         )
+        p.add_argument(
+            '--firewall-type',
+            metavar='<firewall_type>',
+            default="panos",
+            help=_('Type of firewall (panos, fortinet, etc)'),
+        )
         return p
 
     def take_action(self, parsed_args):
-        panos = vfs_utils.PANOS()
-        stack = panos.destroy_instance(self.app.client_manager, parsed_args.name)
+        firewall_class = vfs_utils.get_firewall_class(parsed_args.firewall_type)
+        stack = firewall_class.destroy_instance(self.app.client_manager, parsed_args.name)

@@ -10,11 +10,19 @@ import requests
 
 from osc_lib import utils
 
+def get_firewall_class(firewall_type):
+    if firewall_type.lower() == "panos":
+        return PANOS()
+    elif firewall_type.lower() == "fortigate":
+        return Fortigate()
+
+    raise Exception('Unidentified firewall type')
+
 class PANOS:
     def __init__(self):
         return
 
-    def launch_instance(self, client_manager, bootstrap, password, name, firewall_type):
+    def launch_instance(self, client_manager, bootstrap, password, name):
         object_client = client_manager.object_store
         heat_client = client_manager.orchestration
 
@@ -167,3 +175,7 @@ class PANOS:
             stacks.append(stack)
 
         return stacks
+
+class Fortigate:
+    def __init__(self):
+        return

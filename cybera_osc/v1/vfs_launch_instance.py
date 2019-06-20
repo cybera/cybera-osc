@@ -35,10 +35,9 @@ class CliVFSLaunchInstance(command.Command):
         return p
 
     def take_action(self, parsed_args):
-        panos = vfs_utils.PANOS()
-        stack = panos.launch_instance(
+        firewall_class = vfs_utils.get_firewall_class(parsed_args.firewall_type)
+        stack = firewall_class.launch_instance(
                 self.app.client_manager,
                 bootstrap=parsed_args.bootstrap,
                 password=parsed_args.password,
-                name=parsed_args.name,
-                firewall_type=parsed_args.firewall_type)
+                name=parsed_args.name)

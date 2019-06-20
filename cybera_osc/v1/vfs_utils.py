@@ -13,7 +13,7 @@ from osc_lib import utils
 def get_firewall_class(firewall_type):
     if firewall_type.lower() == "panos":
         return PANOS()
-    elif firewall_type.lower() == "fortigate":
+    elif firewall_type.lower() == "fortios":
         return Fortigate()
 
     raise Exception('Unidentified firewall type')

@@ -27,7 +27,7 @@ class CliVFSLaunchInstance(command.Command):
             help=_('Name of the firewall'),
         )
         p.add_argument(
-            '--firewall-type',
+            '--firewall_type',
             metavar='<firewall_type>',
             default="panos",
             help=_('Type of firewall (panos, fortinet, etc)'),

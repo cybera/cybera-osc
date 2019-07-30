@@ -22,7 +22,7 @@ class CliFloatingIPShow(command.Command):
             'floating_ip',
             metavar='<floating-ip>',
             nargs="+",
-            help=_('Floating IP(s) to delete (IP address or ID)')
+            help=_('Floating IP(s) to show (IP address or ID)')
         )
         return parser
 

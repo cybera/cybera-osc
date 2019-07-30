@@ -95,7 +95,7 @@ class CliCreateProvider(command.Command):
                     identity_client,
                     parsed_args.project.strip()
             )
-            attrs['tenant_id'] = project_id
+            attrs['project_id'] = project_id
         if parsed_args.description:
             attrs['description'] = parsed_args.description
         if parsed_args.provider_network_type:

@@ -18,10 +18,49 @@ def get_firewall_class(firewall_type):
 
     raise Exception('Unidentified firewall type')
 
-class PANOS:
-    def __init__(self):
-        return
+class BaseFirewall:
+    def get_stack(self, heat_client, name=None):
+        stack_name = "cybera_virtual_firewall"
+        if name is not None:
+            stack_name = name
 
+        filters = {
+            'stack_name': stack_name,
+        }
+
+        res = heat_client.stacks.list(**filters)
+        stacks = []
+        for stack in res:
+            stacks.append(stack)
+
+        return stacks
+
+    def destroy_instance(self, client_manager, name):
+        heat_client = client_manager.orchestration
+        stacks = self.get_stack(heat_client, name)
+        if len(stacks) == 0:
+            raise Exception("No stacks found")
+
+        if len(stacks) > 1:
+            raise Exception("More than 1 stack found")
+
+        stack = stacks[0]
+
+        heat_client.stacks.delete(stack.id)
+
+        destroyed = False
+        for _ in range(60):
+            stacks = self.get_stack(heat_client, name)
+            if len(stacks) == 0:
+                destroyed = True
+                break
+            time.sleep(10)
+
+        if not destroyed:
+            raise Exception("Instance was not cleanly destroyed")
+
+
+class PANOS(BaseFirewall):
     def launch_instance(self, client_manager, bootstrap, password, name):
         object_client = client_manager.object_store
         heat_client = client_manager.orchestration
@@ -107,30 +146,6 @@ class PANOS:
     #    destroy_instance(request)
     #    launch_instance(request, bootstrap)
 
-    def destroy_instance(self, client_manager, name):
-        heat_client = client_manager.orchestration
-        stacks = self.get_stack(heat_client, name)
-        if len(stacks) == 0:
-            raise Exception("No stacks found")
-
-        if len(stacks) > 1:
-            raise Exception("More than 1 stack found")
-
-        stack = stacks[0]
-
-        heat_client.stacks.delete(stack.id)
-
-        destroyed = False
-        for _ in range(60):
-            stacks = self.get_stack(heat_client, name)
-            if len(stacks) == 0:
-                destroyed = True
-                break
-            time.sleep(10)
-
-        if not destroyed:
-            raise Exception("Instance was not cleanly destroyed")
-
     def create_backup(self, client_manager, uuid, username, password, description):
         compute_client = client_manager.compute
         object_client = client_manager.object
@@ -160,22 +175,72 @@ class PANOS:
         apikey = x.getElementsByTagName('key')[0].childNodes[0].nodeValue
         return apikey
 
-    def get_stack(self, heat_client, name=None):
+class Fortigate(BaseFirewall):
+    def launch_instance(self, client_manager, bootstrap, password, name):
+        object_client = client_manager.object_store
+        heat_client = client_manager.orchestration
+
+        container_name = "CyberaVFS"
+        if name is not None:
+            container_name = "%s/%s" % (container_name, name)
+
+        hot = cybera_utils.get_object(object_client, container_name, "hot.fortios.yaml")
+        env = cybera_utils.get_object(object_client, container_name, "env.fortios.yaml")
+        license = cybera_utils.get_object(object_client, container_name, "license")
+        license_lines = license.split('\n')
+        license = ""
+        first_line = True
+        for l in license_lines:
+            if not first_line:
+                spaces = len(l)+18
+                l = l.rjust(spaces)
+            first_line = False
+            license += l + '\n'
+
+        if password is None:
+            raise Exception('Password is required')
+
+        tpl = hot
+        tpl = tpl.replace('%PASSWORD%', password)
+        tpl = tpl.replace('%LICENSE%', license)
+
+        print(tpl)
+
         stack_name = "cybera_virtual_firewall"
         if name is not None:
             stack_name = name
 
-        filters = {
+        fields = {
+            'environment': env,
+            'template': tpl,
             'stack_name': stack_name,
+            'timeout_mins': 10,
         }
 
-        res = heat_client.stacks.list(**filters)
-        stacks = []
-        for stack in res:
-            stacks.append(stack)
+        heat_client.stacks.create(**fields)['stack']
 
-        return stacks
+        time.sleep(2)
 
-class Fortigate:
-    def __init__(self):
-        return
+        created = False
+        for _ in range(60):
+            stacks = self.get_stack(heat_client, name)
+            if len(stacks) == 1:
+                stack = stacks[0]
+                if stack.stack_status == 'CREATE_COMPLETE':
+                    created = True
+                    break
+                if stack.stack_status == 'CREATE_FAILED':
+                    break
+            time.sleep(10)
+
+        if not created:
+            raise Exception("Unable to create instance")
+
+    def create_backup(self, client_manager, uuid, username, password, description):
+        pass
+
+    def get_running_config(self, client_manager, uuid, username, password):
+        pass
+
+    def get_api_key(self, client_manager, uuid, username, password):
+        pass

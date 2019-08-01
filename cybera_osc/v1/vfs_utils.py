@@ -15,6 +15,8 @@ def get_firewall_class(firewall_type):
         return PANOS()
     elif firewall_type.lower() == "fortios":
         return Fortigate()
+    elif firewall_type.lower() == "ubuntu":
+        return Ubuntu()
 
     raise Exception('Unidentified firewall type')
 
@@ -204,7 +206,62 @@ class Fortigate(BaseFirewall):
         tpl = tpl.replace('%PASSWORD%', password)
         tpl = tpl.replace('%LICENSE%', license)
 
-        print(tpl)
+        stack_name = "cybera_virtual_firewall"
+        if name is not None:
+            stack_name = name
+
+        fields = {
+            'environment': env,
+            'template': tpl,
+            'stack_name': stack_name,
+            'timeout_mins': 10,
+        }
+
+        heat_client.stacks.create(**fields)['stack']
+
+        time.sleep(2)
+
+        created = False
+        for _ in range(60):
+            stacks = self.get_stack(heat_client, name)
+            if len(stacks) == 1:
+                stack = stacks[0]
+                if stack.stack_status == 'CREATE_COMPLETE':
+                    created = True
+                    break
+                if stack.stack_status == 'CREATE_FAILED':
+                    break
+            time.sleep(10)
+
+        if not created:
+            raise Exception("Unable to create instance")
+
+    def create_backup(self, client_manager, uuid, username, password, description):
+        pass
+
+    def get_running_config(self, client_manager, uuid, username, password):
+        pass
+
+    def get_api_key(self, client_manager, uuid, username, password):
+        pass
+
+class Ubuntu(BaseFirewall):
+    def launch_instance(self, client_manager, bootstrap, password, name):
+        object_client = client_manager.object_store
+        heat_client = client_manager.orchestration
+
+        container_name = "CyberaVFS"
+        if name is not None:
+            container_name = "%s/%s" % (container_name, name)
+
+        hot = cybera_utils.get_object(object_client, container_name, "hot.fortios.yaml")
+        env = cybera_utils.get_object(object_client, container_name, "env.fortios.yaml")
+
+        if password is None:
+            raise Exception('Password is required')
+
+        tpl = hot
+        tpl = tpl.replace('%PASSWORD%', password)
 
         stack_name = "cybera_virtual_firewall"
         if name is not None:

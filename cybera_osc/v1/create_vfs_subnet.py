@@ -66,6 +66,8 @@ class CliCreateVFSSubnet(command.Command):
 
         if parsed_args.gateway == "none":
             attrs['gateway_ip'] = None
+        else:
+            attrs['gateway_ip'] = parsed_args.gateway
 
         print attrs
         return attrs

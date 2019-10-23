@@ -74,7 +74,6 @@ class PANOS(BaseFirewall):
         hot = cybera_utils.get_object(object_client, container_name, "hot.panos.yaml")
         env = cybera_utils.get_object(object_client, container_name, "env.panos.yaml")
         initcfg = cybera_utils.get_object(object_client, container_name, "init-cfg.txt").replace('\n', '\\n').strip()
-        authcodes = cybera_utils.get_object(object_client, container_name, "authcodes").replace('\n', '\\n').strip()
 
         try:
             if bootstrap is None:
@@ -92,7 +91,13 @@ class PANOS(BaseFirewall):
         tpl = hot
         tpl = tpl.replace('%INITCFG%', initcfg)
         tpl = tpl.replace('%BOOTSTRAP%', bootstrap)
-        tpl = tpl.replace('%AUTHCODES%', authcodes)
+
+        v = ""
+        authcodes = cybera_utils.get_object(object_client, container_name, "authcodes")
+        if len(authcodes) != 0:
+            authcodes = authcodes.replace('\n', '\\n').strip()
+            v = '/license/authcodes: "%s"' % (authcodes)
+        tpl = tpl.replace('%AUTHCODES%', v)
 
         stack_name = "cybera_virtual_firewall"
         if name is not None:
@@ -179,6 +184,9 @@ class PANOS(BaseFirewall):
 
 class Fortigate(BaseFirewall):
     def launch_instance(self, client_manager, bootstrap, password, name):
+        if password is None:
+            raise Exception('Password is required')
+
         object_client = client_manager.object_store
         heat_client = client_manager.orchestration
 
@@ -188,23 +196,23 @@ class Fortigate(BaseFirewall):
 
         hot = cybera_utils.get_object(object_client, container_name, "hot.fortios.yaml")
         env = cybera_utils.get_object(object_client, container_name, "env.fortios.yaml")
-        license = cybera_utils.get_object(object_client, container_name, "license")
-        license_lines = license.split('\n')
-        license = ""
-        first_line = True
-        for l in license_lines:
-            if not first_line:
-                spaces = len(l)+18
-                l = l.rjust(spaces)
-            first_line = False
-            license += l + '\n'
-
-        if password is None:
-            raise Exception('Password is required')
 
         tpl = hot
         tpl = tpl.replace('%PASSWORD%', password)
-        tpl = tpl.replace('%LICENSE%', license)
+
+        v = ""
+        license = cybera_utils.get_object(object_client, container_name, "license")
+        if len(license) != 0:
+            license_lines = license.split('\n')
+            license_lines.insert(0, 'license: |')
+            first_line = True
+            for l in license_lines:
+                if not first_line:
+                    spaces = len(l)+18
+                    l = l.rjust(spaces)
+                first_line = False
+                v += l + '\n'
+        tpl = tpl.replace('%LICENSE%', v)
 
         stack_name = "cybera_virtual_firewall"
         if name is not None:

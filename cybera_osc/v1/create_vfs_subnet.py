@@ -64,10 +64,11 @@ class CliCreateVFSSubnet(command.Command):
         attrs['enable_dhcp'] = False
         attrs['ip_version'] = 4
 
-        if parsed_args.gateway == "none":
-            attrs['gateway_ip'] = None
-        else:
-            attrs['gateway_ip'] = parsed_args.gateway
+        if parsed_args.gateway != 'auto' and parsed_args.gateway != "":
+            if parsed_args.gateway == 'none':
+                attrs['gateway_ip'] = None
+            else:
+                attrs['gateway_ip'] = parsed_args.gateway
 
         print attrs
         return attrs

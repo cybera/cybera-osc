@@ -1,7 +1,7 @@
 import logging
 
-from cybera_utils import project_fuzzy_search
-from cybera_utils import user_fuzzy_search
+from cybera_utils import project_search
+from cybera_utils import user_search
 
 from osc_lib import utils
 from osc_lib.command import command
@@ -43,7 +43,7 @@ class CliProjectUserRemove(command.Command):
         )
 
         kwargs = {}
-        kwargs['user'] = user_fuzzy_search(identity_client, parsed_args.user.strip())
-        kwargs['project'] = project_fuzzy_search(identity_client, parsed_args.project.strip())
+        kwargs['user'] = user_search(identity_client, parsed_args.user.strip())
+        kwargs['project'] = project_search(identity_client, parsed_args.project.strip())
 
         identity_client.roles.revoke(role.id, **kwargs)

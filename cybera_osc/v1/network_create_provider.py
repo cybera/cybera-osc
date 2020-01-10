@@ -1,7 +1,7 @@
 import json
 import logging
 
-from cybera_utils import project_fuzzy_search
+from cybera_utils import project_search
 from openstackclient.identity import common as identity_common
 
 from openstackclient.network import common
@@ -91,7 +91,7 @@ class CliCreateProvider(command.Command):
             attrs['name'] = str(parsed_args.name)
         if parsed_args.project:
             identity_client = client_manager.identity
-            project_id = project_fuzzy_search(
+            project_id = project_search(
                     identity_client,
                     parsed_args.project.strip()
             )

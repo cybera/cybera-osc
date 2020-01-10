@@ -1,7 +1,7 @@
 import logging
 
-from cybera_utils import project_fuzzy_search
-from cybera_utils import image_fuzzy_search
+from cybera_utils import project_search
+from cybera_utils import image_search
 
 from osc_lib import utils
 from osc_lib.command import command
@@ -32,8 +32,8 @@ class CliImageSharing(command.Command):
         identity_client = self.app.client_manager.identity
         image_client = self.app.client_manager.image
 
-        image_id = image_fuzzy_search(image_client, parsed_args.image.strip())
-        project_id = project_fuzzy_search(identity_client, parsed_args.project.strip())
+        image_id = image_search(image_client, parsed_args.image.strip())
+        project_id = project_search(identity_client, parsed_args.project.strip())
 
         image_client.image_members.create(
             image_id,

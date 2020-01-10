@@ -32,7 +32,7 @@ class CliProjectCleanup(command.Command):
         object_client = self.app.client_manager.object_store
         volume_client = self.app.client_manager.volume
 
-        projectid = cybera_utils.project_fuzzy_search(identity_client, parsed_args.project)
+        projectid = cybera_utils.project_search(identity_client, parsed_args.project)
 
         if not parsed_args.noop:
             LOG.warn("Disabling project: %s" % parsed_args.project)

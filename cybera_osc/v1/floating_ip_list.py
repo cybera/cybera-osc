@@ -1,7 +1,7 @@
 import json
 import logging
 
-from cybera_utils import project_fuzzy_search
+from cybera_utils import project_search
 
 from osc_lib.command import command
 
@@ -27,7 +27,7 @@ class CliFloatingIPList(command.Command):
         query = {}
         if parsed_args.project is not None:
             identity_client = self.app.client_manager.identity
-            project_id = project_fuzzy_search(identity_client, parsed_args.project.strip())
+            project_id = project_search(identity_client, parsed_args.project.strip())
             query['project_id'] = project_id
             query['tenant_id'] = project_id
 

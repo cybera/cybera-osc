@@ -1,6 +1,6 @@
 import logging
 
-from cybera_utils import project_fuzzy_search
+from cybera_utils import project_search
 from osc_lib.cli import parseractions
 from osc_lib.command import command
 from osc_lib import utils
@@ -37,7 +37,7 @@ class CliCreateContainer(command.Command):
 
         auth = self.app.client_manager.auth
         identity_client = self.app.client_manager.identity
-        user_project = project_fuzzy_search(identity_client, parsed_args.project.strip())
+        user_project = project_search(identity_client, parsed_args.project.strip())
 
 	new_auth = v3.Password(auth_url=auth.auth_url + "/v3",
                    username=auth._username,

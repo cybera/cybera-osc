@@ -38,8 +38,8 @@ class CliUserCleanup(command.Command):
         object_client = self.app.client_manager.object_store
         volume_client = self.app.client_manager.volume
 
-        userid = cybera_utils.user_fuzzy_search(identity_client, parsed_args.user)
-        projectid = cybera_utils.project_fuzzy_search(identity_client, parsed_args.project)
+        userid = cybera_utils.user_search(identity_client, parsed_args.user)
+        projectid = cybera_utils.project_search(identity_client, parsed_args.project)
 
         projects = identity_client.users.list(tenant_id=projectid)
         if len(projects) > 0:

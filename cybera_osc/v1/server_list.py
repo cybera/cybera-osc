@@ -78,7 +78,7 @@ class CliServerList(command.Lister):
 
         project_id = None
         if parsed_args.project:
-            project_id = cybera_utils.project_fuzzy_search(
+            project_id = cybera_utils.project_search(
                     identity_client,
                     parsed_args.project
             )
@@ -86,7 +86,7 @@ class CliServerList(command.Lister):
 
         user_id = None
         if parsed_args.user:
-            user_id = cybera_utils.user_fuzzy_search(
+            user_id = cybera_utils.user_search(
                     identity_client,
                     parsed_args.user
             )

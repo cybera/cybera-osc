@@ -195,14 +195,10 @@ def search(search_string, search_list):
             found.append(x.id)
             match = True
             break
-
-    # Look for exact name match
-    if not match:
-        for x in search_list:
-            if search_string.lower() == x.name.lower():
-                found.append(x.id)
-                match = True
-                break
+        if search_string.lower() == x.name.lower():
+            found.append(x.id)
+            match = True
+            break
 
     return found
 

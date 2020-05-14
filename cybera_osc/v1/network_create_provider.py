@@ -37,22 +37,22 @@ class CliCreateProvider(command.Command):
             help=_('Description'),
         )
         p.add_argument(
-            '--provider_physical_network',
-            metavar='<provider-physical-network>',
+            '--physical_network',
+            metavar='<physical-network>',
             dest='physical_network',
             help=_("Name of the physical network over which the virtual network is implemented")
         )
         p.add_argument(
-            '--provider_network_type',
-            metavar='<provider-network-type>',
-            dest='provider_network_type',
+            '--network_type',
+            metavar='<network-type>',
+            dest='network_type',
             help=_("The physical mechanism by which the virtual network "
                "is implemented. For example: "
                "flat, geneve, gre, local, vlan, vxlan.")
         )
         p.add_argument(
-            '--provider_segment',
-            metavar='<provider-segment>',
+            '--segment',
+            metavar='<segment>',
             dest='segmentation_id',
             help=_("VLAN ID for VLAN networks or Tunnel ID for GENEVE/GRE/VXLAN networks")
         )
@@ -98,8 +98,8 @@ class CliCreateProvider(command.Command):
             attrs['project_id'] = project_id
         if parsed_args.description:
             attrs['description'] = parsed_args.description
-        if parsed_args.provider_network_type:
-            attrs['provider:network_type'] = parsed_args.provider_network_type
+        if parsed_args.network_type:
+            attrs['provider:network_type'] = parsed_args.network_type
         if parsed_args.physical_network:
             attrs['provider:physical_network'] = parsed_args.physical_network
         if parsed_args.segmentation_id:

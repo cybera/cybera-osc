@@ -70,7 +70,6 @@ class CliCreateVFSSubnet(command.Command):
             else:
                 attrs['gateway_ip'] = parsed_args.gateway
 
-        print attrs
         return attrs
 
     def take_action(self, parsed_args):

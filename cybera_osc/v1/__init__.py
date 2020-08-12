@@ -11,6 +11,7 @@ from hypervisor_stats import *
 from image_fuzzy_search import *
 from image_search import *
 from image_latest import *
+from image_share_list import *
 from image_sharing import *
 from network_create_provider import *
 from network_list import *
@@ -30,7 +31,9 @@ from user_membership import *
 from user_role_list import *
 from user_fuzzy_search import *
 from user_search import *
-from vfs_instance_upgradeable import *
 from vfs_destroy_instance import *
+from vfs_share_image_to_all import *
+from vfs_instance_upgradeable import *
 from vfs_launch_instance import *
+from vfs_unshare_image_from_all import *
 from jttest import *

@@ -10,6 +10,16 @@ import requests
 
 from osc_lib import utils
 
+def get_vfs_projects(identity_client):
+    projects = []
+
+    projects_list = identity_client.projects.list()
+    for project in projects_list:
+        if "-vfs" in project.name.lower():
+            projects.append(project)
+
+    return projects
+
 def get_firewall_class(firewall_type):
     if firewall_type.lower() == "panos":
         return PANOS()

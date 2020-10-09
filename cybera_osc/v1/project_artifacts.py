@@ -30,6 +30,7 @@ class CliProjectArtifacts(command.Command):
         artifacts = {}
 
         projectid = cybera_utils.project_fuzzy_search(identity_client, parsed_args.project.strip())
+        artifacts['project_id'] = projectid
 
         artifacts['security_groups'] = []
         filters = {}

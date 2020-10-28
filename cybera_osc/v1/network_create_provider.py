@@ -67,7 +67,7 @@ class CliCreateProvider(command.Command):
                    "repeat option to set multiple availability zones)")
         )
         p.add_argument(
-            '--disable_port_security',
+            '--disable-port-security',
             action='store_true',
             help=_("Disable port security by default for ports created on "
                    "this network")

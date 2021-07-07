@@ -75,6 +75,7 @@ class CliServerList(command.Lister):
     def take_action(self, parsed_args):
         compute_client = self.app.client_manager.compute
         identity_client = self.app.client_manager.identity
+        image_client = self.app.client_manager.image
 
         project_id = None
         if parsed_args.project:
@@ -103,8 +104,7 @@ class CliServerList(command.Lister):
         # image name is given, map it to ID.
         image_id = None
         if parsed_args.image:
-            image_id = utils.find_resource(compute_client.images,
-                                           parsed_args.image).id
+            image_id = utils.find_resource(image_client.images, parsed_args.image).id
 
         host = None
         if parsed_args.host:
@@ -163,7 +163,7 @@ class CliServerList(command.Lister):
         # Needed so that we can display the "Image Name" column.
         # "Image Name" is not crucial, so we swallow any exceptions.
         try:
-            images_list = self.app.client_manager.image.images.list()
+            images_list = image_client.api.image_list()
             for i in images_list:
                 images[i.id] = i
         except Exception:

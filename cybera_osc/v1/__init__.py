@@ -35,5 +35,6 @@ from vfs_destroy_instance import *
 from vfs_share_image_to_all import *
 from vfs_instance_upgradeable import *
 from vfs_launch_instance import *
+from vfs_list_clear_vlan_firewalls import *
 from vfs_unshare_image_from_all import *
 from jttest import *
